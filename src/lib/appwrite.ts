@@ -1,13 +1,13 @@
 import {
-  PUBLIC_APPWRITE_ENDPOINT,
-  PUBLIC_APPWRITE_PROJECT,
+  PUBLIC_ENDPOINT,
+  PUBLIC_PROJECT_ID,
 } from "$env/static/public";
-import { Databases, Account, Client } from "appwrite";
+import { Databases, Account, Client, ID } from "appwrite"
 
 const client = new Client();
 client
-  .setEndpoint(PUBLIC_APPWRITE_ENDPOINT)
-  .setProject(PUBLIC_APPWRITE_PROJECT);
+  .setEndpoint(PUBLIC_ENDPOINT)
+  .setProject(PUBLIC_PROJECT_ID);
 
 const account = new Account(client);
 const databases = new Databases(client);
@@ -16,4 +16,5 @@ export const appwrite = {
   client,
   account,
   databases,
+  ID
 };
