@@ -2,7 +2,10 @@
 	import { page } from '$app/stores';
 	import { createMessage, deleteMessage } from '$lib/hooks';
 	import { writable, type Writable } from 'svelte/store';
-	import type { Models } from 'appwrite';
+	import  type { Models } from 'appwrite';
+	import { onMount, onDestroy } from 'svelte';
+	import { appwrite } from '$lib/appwrite';
+    import { PUBLIC_DATABASE_ID, PUBLIC_MESSAGES_ID } from "$env/static/public";
 
 	let message: Writable<string> = writable();
 	let documents: Writable<Models.Document[]> = writable($page.data.messages.documents);
@@ -10,13 +13,25 @@
 	const handleSubmit = async () => {
 		const newMessage = await createMessage($message);
 		$message = '';
-		documents.update((documentsList) => [...documentsList, newMessage]);
+        console.log("created")
 	};
 
 	const handleDelete = async (messageId: string) => {
 		await deleteMessage(messageId);
-		documents.update((documentsList) => documentsList.filter((d) => d.$id !== messageId));
+        console.log("deleted")
 	};
+
+    onMount(() => {
+        appwrite.client.subscribe(`databases.${PUBLIC_DATABASE_ID}.collections.${PUBLIC_MESSAGES_ID}.documents`, response => {
+        if(response.events.includes("databases.*.collections.*.documents.*.create")) {
+            documents.update((documentsList) => [...documentsList, response.payload]);
+        } else if("databases.*.collections.*.documents.*.delete") {
+            documents.update((documentsList) => documentsList.filter((d) => d.$id !== response.payload.$id));
+        }
+});
+    })
+
+    onDestroy(() => {})
 </script>
 
 <h1>CHAT</h1>
