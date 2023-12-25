@@ -10,17 +10,12 @@
 	const handleSubmit = async () => {
 		const newMessage = await createMessage($message);
 		$message = '';
-		documents.update((documentsList) => {
-			documentsList.push(newMessage);
-			return documentsList;
-		});
+		documents.update((documentsList) => [...documentsList, newMessage]);
 	};
 
 	const handleDelete = async (messageId: string) => {
 		await deleteMessage(messageId);
-		documents.update((documentsList) => {
-			return documentsList.filter((d) => d.$id !== messageId);
-		});
+		documents.update((documentsList) => documentsList.filter((d) => d.$id !== messageId));
 	};
 </script>
 
